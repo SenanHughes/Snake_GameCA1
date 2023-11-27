@@ -16,11 +16,13 @@ class Treats{
 
     void Draw();
 
-    void Update();
+    Vector2 GetPosition() const;
 
-    bool CheckCollision(Vector2 snakePosition, float snakeRadius);
+    //void Update();
 
-    bool IsOutOfScreen(); 
+    //bool CheckCollision(Vector2 snakePosition, float snakeRadius);
+
+    //bool IsOutOfScreen(); 
 };
 
 #endif
