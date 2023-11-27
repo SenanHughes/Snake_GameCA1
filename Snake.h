@@ -1,16 +1,16 @@
-#ifndef BALL_H
-#define BALL_H
+#ifndef SNAKE_H
+#define SNAKE_H
 
 #include "raylib.h"
 
-class Ball{
+class Snake{
     private:
     Vector2 position;
     float radius;
     Color color;
 
     public:
-    Ball(Vector2 pos, float r, Color c);
+    Snake(Vector2 pos, float r, Color c);
 
     void Draw();
 

@@ -1,23 +1,23 @@
-#include "Ball.h"
+#include "Snake.h"
 
-Ball::Ball(Vector2 pos, float r, Color c)
+Snake::Snake(Vector2 pos, float r, Color c)
 : position(pos),
     radius(r),
     color(c){}
 
-void Ball::Draw(){
+void Snake::Draw(){
     DrawCircleV(position,radius,color);
 }
 
-void Ball::Move(Vector2 offset){
+void Snake::Move(Vector2 offset){
     position.x += offset.x;
     position.y += offset.y;
 }
 
-Vector2 Ball::GetPosition() const{
+Vector2 Snake::GetPosition() const{
     return position;
 }
 
-float Ball::GetRadius() const{
+float Snake::GetRadius() const{
     return radius;
 }
