@@ -1,11 +1,6 @@
-// The Base of this project is from the Ball & Obstacle game made during the lectures
-// Using the existing structure and adapting functionality where required to work as a Snake game variant
-
 #include "raylib.h"
 #include "Snake.h"
 #include "Treats.h"
-
-//const int MAX_OBSTACLES = 10;
 
 int main(void)
 {
@@ -14,77 +9,62 @@ int main(void)
     int screenWidth = 800;
     int screenHeight = 600;
 
-    InitWindow(screenWidth, screenHeight, "SnakeCA");
+    InitWindow(screenWidth, screenHeight, "2nd Game Example");
 
-    Snake player({screenWidth/2, screenHeight-50}, 20, RAYWHITE);
-    Treats treatEat({screenWidth/2, screenHeight-110}, 20, PINK);
-    //Treats treatEat({(int)GetRandomValue(0+20,screenWidth-20),(int)(0+20,screenHeight-20)}, 20, PINK);
-    
+    Snake player({screenWidth/2, screenHeight-50}, {20,20}, RAYWHITE);
+
+
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
     //--------------------------------------------------------------------------------------
-    int framesCounter = 0;
-    int radConst = 40;
-    bool movingUpDown = false;
-    bool movingLeftRight = false;
-    Vector2 moveSpeed = {0,0};
+    int frameCount = 0;
+    bool moveUpDown = false;
+    bool moveLeftRight = false;
     bool gameOver = false; 
-    bool tastyTreat = true;
+    Vector2 snakeDirection = {0,0};
 
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
         if(!gameOver)
-        // This block defines the movement of the player character - basic sphere, a further block will be defined to control the movement of the body on a delay
         {
-            if(IsKeyDown(KEY_UP) && !movingUpDown){
-            moveSpeed = {0, -radConst};
-            movingUpDown = true;
-            movingLeftRight = false;
-            }
-            if(IsKeyDown(KEY_DOWN) && !movingUpDown){
-            moveSpeed = {0, radConst};
-            movingUpDown = true;
-            movingLeftRight = false;
-            }
-            if(IsKeyDown(KEY_RIGHT) && !movingLeftRight){
-            moveSpeed = {radConst, 0};
-            movingLeftRight = true;
-            movingUpDown = false;
-            }
-            if(IsKeyDown(KEY_LEFT) && !movingLeftRight){
-            moveSpeed = {-radConst, 0};
-            movingLeftRight = true;
-            movingUpDown = false;
+            if(IsKeyDown(KEY_UP)  && moveUpDown == false){
+            snakeDirection = {0,-player.GetSize().y};
+            moveUpDown = true;
+            moveLeftRight = false;
             }
 
-            if(framesCounter%10 == 0){
-                player.Move(moveSpeed);
+            if(IsKeyDown(KEY_DOWN) && moveUpDown == false){
+            snakeDirection = {0,player.GetSize().y};
+            moveUpDown = true;
+            moveLeftRight = false;
             }
 
-        
+            if(IsKeyDown(KEY_LEFT) && moveLeftRight == false){
+            snakeDirection = {-player.GetSize().x, 0};
+            moveLeftRight = true;
+            moveUpDown = false;
+            }
 
-            framesCounter++;
+            if(IsKeyDown(KEY_RIGHT) && moveLeftRight == false){
+            snakeDirection = {player.GetSize().x, 0};
+            moveLeftRight = true;
+            moveUpDown = false;
+            }
+
+            if(frameCount%10 == 0){
+                player.Move(snakeDirection);
+            }
+
+            if(player.GetPosition().y < 0 ||
+                player.GetPosition().y > screenHeight - player.GetSize().y||
+                player.GetPosition().x  == 0 ||
+                player.GetPosition().x == screenWidth - player.GetSize().x){
+                    gameOver = true;
+                }
+
+            frameCount++;
         }
 
-        if(gameOver){
-            if(IsKeyDown(KEY_R)){
-                gameOver = false;
-                
-            }
-        }
-
-        // This block checks to see whether the player collides with the edges of the screen and ends the game if so
-        if(player.GetPosition().y < 0 + player.GetRadius() || 
-            player.GetPosition().y > screenHeight - player.GetRadius() ||
-            player.GetPosition().x == 0 + player.GetRadius() ||
-            player.GetPosition().x == screenWidth - player.GetRadius()){
-            gameOver = true;
-        }
-
-        if(CheckCollisionCircles(treatEat.GetPosition(), treatEat.Size()/2 , player.GetPosition(), player.GetRadius()/2)){
-            gameOver= true;
-            Treats treatEat({(int)GetRandomValue(0+20,screenWidth-20),(int)(0+20,screenHeight-20)}, 20, YELLOW);
-        }
         // Update
         //----------------------------------------------------------------------------------
         // TODO: Update your variables here
@@ -96,21 +76,16 @@ int main(void)
 
             ClearBackground(BLACK);
             player.Draw();
-            treatEat.Draw();
 
             if(gameOver){
                 DrawText("GAME OVER", screenWidth/2 -60, screenHeight/2,20, RED);
-            }
-
-            if(tastyTreat){
-                
             }
 
 
 
         EndDrawing();
         //----------------------------------------------------------------------------------
-        }
+    }
 
     // De-Initialization
     //--------------------------------------------------------------------------------------

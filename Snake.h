@@ -6,11 +6,12 @@
 class Snake{
     private:
     Vector2 position;
-    float radius;
+    Vector2 size;
+
     Color color;
 
     public:
-    Snake(Vector2 pos, float r, Color c);
+    Snake(Vector2 pos, Vector2 sz, Color c);
 
     void Draw();
 
@@ -18,7 +19,7 @@ class Snake{
 
     Vector2 GetPosition() const;
 
-    float GetRadius() const; 
+    Vector2 GetSize() const; 
 };
 
 #endif

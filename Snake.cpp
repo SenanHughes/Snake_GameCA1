@@ -1,12 +1,12 @@
 #include "Snake.h"
 
-Snake::Snake(Vector2 pos, float r, Color c)
+Snake::Snake(Vector2 pos, Vector2 sz, Color c)
 : position(pos),
-    radius(r),
+    size(sz),
     color(c){}
 
 void Snake::Draw(){
-    DrawCircleV(position,radius,color);
+    DrawRectangleV(position, size, color);
 }
 
 void Snake::Move(Vector2 offset){
@@ -18,6 +18,7 @@ Vector2 Snake::GetPosition() const{
     return position;
 }
 
-float Snake::GetRadius() const{
-    return radius;
+Vector2 Snake::GetSize() const{
+    return size;
 }
+
