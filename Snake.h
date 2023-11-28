@@ -7,7 +7,6 @@ class Snake{
     private:
     Vector2 position;
     Vector2 size;
-
     Color color;
 
     public:

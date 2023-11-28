@@ -8,19 +8,18 @@ class Treats{
     Vector2 position;
     Vector2 size;
     Color color; 
-    float speed; 
 
     public:
-    Treats(Vector2 pos, Vector2 sz, Color c, float s);
-    Treats();
+    Treats(Vector2 pos, Vector2 sz, Color c);
+    //Treats();
 
     void Draw();
 
-    void Update();
+    //void Update();
 
-    bool CheckCollision(Vector2 ballPosition, float ballRadius);
+    //bool CheckCollision(Vector2 ballPosition, float ballRadius);
 
-    bool IsOutOfScreen(); 
+    //bool IsOutOfScreen(); 
 };
 
 #endif

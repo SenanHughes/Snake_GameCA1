@@ -1,7 +1,7 @@
 #include "Snake.h"
 
 Snake::Snake(Vector2 pos, Vector2 sz, Color c)
-: position(pos),
+:   position(pos),
     size(sz),
     color(c){}
 

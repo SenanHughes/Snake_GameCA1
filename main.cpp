@@ -11,7 +11,10 @@ int main(void)
 
     InitWindow(screenWidth, screenHeight, "2nd Game Example");
 
-    Snake player({screenWidth/2, screenHeight-50}, {20,20}, RAYWHITE);
+    Snake player({screenWidth/2, screenHeight-50}, {40,40}, RAYWHITE);
+    Treats tastyTreat({screenWidth-(int)GetRandomValue(player.GetSize().x,screenWidth - player.GetSize().x),screenHeight-(int)GetRandomValue(player.GetSize().y,screenHeight-player.GetSize().y)},{20,20},PINK);
+    //Treats tastyTreat({(float)GetRandomValue(0,screenWidth- 20), (float)GetRandomValue(0,screenHeight-20)}, (20,20),PINK);
+
 
 
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
@@ -76,6 +79,7 @@ int main(void)
 
             ClearBackground(BLACK);
             player.Draw();
+            tastyTreat.Draw();
 
             if(gameOver){
                 DrawText("GAME OVER", screenWidth/2 -60, screenHeight/2,20, RED);
