@@ -11,19 +11,25 @@ int main(void)
 
     InitWindow(screenWidth, screenHeight, "2nd Game Example");
 
-    Snake player({screenWidth/2, screenHeight-50}, {40,40}, RAYWHITE);
-    Treats tastyTreat({screenWidth-(int)GetRandomValue(player.GetSize().x,screenWidth - player.GetSize().x),screenHeight-(int)GetRandomValue(player.GetSize().y,screenHeight-player.GetSize().y)},{20,20},PINK);
     //Treats tastyTreat({(float)GetRandomValue(0,screenWidth- 20), (float)GetRandomValue(0,screenHeight-20)}, (20,20),PINK);
 
-
+    
 
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
     //--------------------------------------------------------------------------------------
     int frameCount = 0;
+    int actorSize = 20;
     bool moveUpDown = false;
     bool moveLeftRight = false;
     bool gameOver = false; 
     Vector2 snakeDirection = {0,0};
+    Vector2 offset = {0,0};
+
+    offset.x = screenWidth%actorSize;
+    offset.y = screenHeight%actorSize;
+    
+    Snake player({screenWidth/2, screenHeight-50}, {actorSize,actorSize}, RAYWHITE);
+    Treats tastyTreat({GetRandomValue(0, (screenWidth/actorSize)-1)*actorSize+offset.x/2, GetRandomValue(0, (screenHeight/actorSize)-1)*actorSize+offset.y},{20,20},PINK);
 
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
