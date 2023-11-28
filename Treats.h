@@ -7,22 +7,21 @@ class Treats{
     private:
     Vector2 position;
     float radius;
-    Color color; 
-    //float speed; 
+    Color color;
 
     public:
-    Treats(Vector2 pos, float r, Color c);//, float s);
+    Treats(Vector2 pos, float r, Color c);
     Treats();
 
     void Draw();
 
-    Vector2 GetPosition() const;
+    Vector2 GetPosition();
+    
+    float Size() const;
 
-    //void Update();
+    void Move(Vector2 offset);
 
-    //bool CheckCollision(Vector2 snakePosition, float snakeRadius);
-
-    //bool IsOutOfScreen(); 
+    //bool CheckCollision(Vector2 snakePos, float snakeRad);
 };
 
 #endif

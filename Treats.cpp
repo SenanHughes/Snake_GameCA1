@@ -12,19 +12,10 @@ void Treats::Draw(){
     DrawCircleV(position, radius, color);
 }
 
-Vector2 Treats::GetPosition() const{
+Vector2 Treats::GetPosition(){
     return position;
 }
 
-//void Treats::Update(){
-//    position.y += speed;
-//}
-
-//bool Treats::CheckCollision(Vector2 snakePosition, float snakeRadius){
-//    Rectangle treatCircle = {position.x, position.y, radius};
-//    return CheckCollisionCircleRec(snakePosition, snakeRadius, treatCircle);
-//}
-
-//bool Treats::IsOutOfScreen(){
-//    return position.y>GetScreenHeight() + size.y;
-//}
+float Treats::Size() const{
+    return radius;
+}
