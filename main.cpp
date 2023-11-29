@@ -19,17 +19,19 @@ int main(void)
     //--------------------------------------------------------------------------------------
     bool moveUpDown = false;
     bool moveLeftRight = false;
-    bool gameOver = false; 
-    bool updateTreat = false;
+    bool gameOver = false;
     bool snakeGrow = false;
     int frameCount = 0;
     int actorSize = 20;
     int snakeSize = 1;
     Vector2 snakeDirection = {0,0};
+    Vector2 previousSnakeSection[snakeSize] = {0,0};
     
     Snake player[snakeSize];
 
-    player[0] = Snake({screenWidth/2, screenHeight/2}, {actorSize,actorSize}, RAYWHITE);
+    for(int i = 0; i < snakeSize; i++){
+        player[i] = Snake({screenWidth/2, screenHeight/2}, {actorSize,actorSize}, RAYWHITE);
+    }
     Treats tastyTreat({GetRandomValue(0, (screenWidth/actorSize)-1)*actorSize, GetRandomValue(0, (screenHeight/actorSize)-1)*actorSize},{20,20},PINK);
 
     // Main game loop
@@ -61,13 +63,18 @@ int main(void)
             moveUpDown = false;
             }
 
+
+            for(int i = 0; i < snakeSize; i++){
+                previousSnakeSection[i] = player[i].GetPosition();
+            }
+
             if(frameCount%10 == 0){
                 for(int i = 0; i < snakeSize; i++){
                     if(i == 0){
                         player[i].Move(snakeDirection);
                     }
                     else{
-                        player[snakeSize].SetPosition(player[snakeSize-1].GetPosition());
+                        player[i].SetPosition(previousSnakeSection[i-1]);
                     }
                 }
             }
@@ -79,17 +86,23 @@ int main(void)
                     gameOver = true;
             }
             
-            if(player[0].GetPosition().x == tastyTreat.GetPosition().x && player[0].GetPosition().y == tastyTreat.GetPosition().y && !updateTreat){
+            if(player[0].GetPosition().x == tastyTreat.GetPosition().x && player[0].GetPosition().y == tastyTreat.GetPosition().y){
                 tastyTreat.newTreatLoc({GetRandomValue(0, (screenWidth/actorSize)-1)*actorSize, GetRandomValue(0, (screenHeight/actorSize)-1)*actorSize});
                 snakeGrow = true;
-            //    updateTreat = true;
             }
 
-            //if(snakeGrow){
-            //    snakeSize++;
-            //    player[snakeSize] = Snake({player[snakeSize-1].GetPosition().x - snakeDirection.x, player[snakeSize-1].GetPosition().y - snakeDirection.y}, {actorSize,actorSize}, RAYWHITE);
+            if(snakeGrow){
+                snakeSize++;
+                snakeGrow = false;
+                player[snakeSize].SetPosition(player[snakeSize-1].GetPosition());
+
+
+
+
+            //    player[snakeSize].SetPosition(player[snakeSize-1].GetPosition());
+            //    player[snakeSize].SetPosition = Snake({player[snakeSize-1].GetPosition().x - snakeDirection.x, player[snakeSize-1].GetPosition().y - snakeDirection.y}, {actorSize,actorSize}, RAYWHITE);
             //    //player[snakeSize].SetPosition(player[snakeSize-1].GetPosition());
-            //}
+            }
 
             frameCount++;
         }
@@ -101,19 +114,15 @@ int main(void)
         BeginDrawing();
 
             ClearBackground(BLACK);
-            if(snakeSize < 1){
-                player[0].Draw();
-            }else {for(int i = 0; i < snakeSize; i++)
-                player[i].Draw();
+            //if(snakeSize == 0){
+                //player[0].Draw();
+            //    DrawRectangleV(player[0].GetPosition,player[0].GetSize,RAYWHITE);
+            for(int i = 0; i < snakeSize; i++){
+                //player[i].Draw();
+                DrawRectangleV(player[i].GetPosition(), {actorSize,actorSize}, RAYWHITE);
             }
             tastyTreat.Draw();
 
-
-            //if(updateTreat){
-            //    DrawText("drawtreat",0,20,50,YELLOW);
-            //    tastyTreat.Draw();
-            //    updateTreat = false;
-            //}
 
             if(gameOver){
                 DrawText("GAME OVER", screenWidth/2 -60, screenHeight/2,20, RED);
