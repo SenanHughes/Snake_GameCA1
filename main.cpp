@@ -16,13 +16,21 @@ int main(void)
 
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
     //--------------------------------------------------------------------------------------
+    Rectangle hardBtn = {140,235,342,65};
+    Rectangle softBtn = {540,235,330,65};
+    Rectangle slowBtn = {70,395,145,65};
+    Rectangle fastBtn = {270,395,155,65};
+    Rectangle superSpeedyBtn = {490,395,445,65};
+    Rectangle startBtn = {screenWidth/2-190,595,380,105};
     bool singleKeyPress = true;
     bool gameOver = false;
+    bool gameStart = false;
     bool snakeGrow = false;
     int frameCount = 0;
     float actorSize = 20.0f;
-    int snakeSize = 256;
+    int snakeSize = 2000;
     int snakeLength = 1;
+    int speedVal = 10;
     Vector2 snakeDirection = {0,0};
     Vector2 previousSnakeSection[snakeSize] = {0,0};
     
@@ -39,8 +47,14 @@ int main(void)
 
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
-    {
-        if(!gameOver)
+    {   
+        if(!gameStart){
+            if(IsKeyPressed(KEY_P)){
+                gameStart = true;
+            }
+        }
+
+        if(!gameOver && gameStart)
         {
             if(IsKeyPressed(KEY_UP) && snakeDirection.y == 0 && singleKeyPress){
             snakeDirection = {0,-actorSize};
@@ -67,7 +81,7 @@ int main(void)
                 previousSnakeSection[i] = player[i].GetPosition();
             }
 
-            if(frameCount%5 == 0){
+            if(frameCount%speedVal == 0){
                 for(int i = 0; i < snakeLength; i++){
                     if(i == 0){
                         player[i].Move(snakeDirection);
@@ -102,7 +116,78 @@ int main(void)
         // Draw
         //----------------------------------------------------------------------------------
         BeginDrawing();
+        if(!gameStart){
+            ClearBackground(RAYWHITE);
+            DrawText("Welcome to Snake", screenWidth/2-260, 60, 60, PINK);
+            DrawText("Hard Walls", 150, 240, 60, BLACK);
+            DrawText("Soft Walls", 550, 240, 60, BLACK);
+            DrawText("Slow", 80, 400, 60, BLACK);
+            DrawText("Fast", 280, 400, 60, BLACK);
+            DrawText("Super Speedy", 500, 400, 60, BLACK);
+            DrawText("START", screenWidth/2-180, 600, 100, GREEN);
 
+
+            if(GetMousePosition().x > startBtn.x && GetMousePosition().x < startBtn.x + startBtn.width &&
+                GetMousePosition().y > startBtn.y && GetMousePosition().y < startBtn.y + startBtn.height &&
+                    IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
+                        gameStart = true;
+                    }
+            if(GetMousePosition().x > startBtn.x && GetMousePosition().x < startBtn.x + startBtn.width &&
+                GetMousePosition().y > startBtn.y && GetMousePosition().y < startBtn.y + startBtn.height){
+                    DrawRectangleLines(startBtn.x, startBtn.y, startBtn.width, startBtn.height ,RED);
+                }
+            
+            if(GetMousePosition().x > hardBtn.x && GetMousePosition().x < hardBtn.x + hardBtn.width &&
+                GetMousePosition().y > hardBtn.y && GetMousePosition().y < hardBtn.y + hardBtn.height &&
+                    IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
+                        gameStart = true;
+                    }
+            if(GetMousePosition().x > hardBtn.x && GetMousePosition().x < hardBtn.x + hardBtn.width &&
+                GetMousePosition().y > hardBtn.y && GetMousePosition().y < hardBtn.y + hardBtn.height){
+                    DrawRectangleLines(hardBtn.x, hardBtn.y, hardBtn.width, hardBtn.height ,RED);
+                }
+
+            if(GetMousePosition().x > softBtn.x && GetMousePosition().x < softBtn.x + softBtn.width &&
+                GetMousePosition().y > softBtn.y && GetMousePosition().y < softBtn.y + softBtn.height &&
+                    IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
+                        gameStart = true;
+                    }
+            if(GetMousePosition().x > softBtn.x && GetMousePosition().x < softBtn.x + softBtn.width &&
+                GetMousePosition().y > softBtn.y && GetMousePosition().y < softBtn.y + softBtn.height){
+                    DrawRectangleLines(softBtn.x, softBtn.y, softBtn.width, softBtn.height ,RED);
+                }
+            
+            if(GetMousePosition().x > slowBtn.x && GetMousePosition().x < slowBtn.x + slowBtn.width &&
+                GetMousePosition().y > slowBtn.y && GetMousePosition().y < slowBtn.y + slowBtn.height &&
+                    IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
+                        speedVal = 10;
+                    }
+            if(GetMousePosition().x > slowBtn.x && GetMousePosition().x < slowBtn.x + slowBtn.width &&
+                GetMousePosition().y > slowBtn.y && GetMousePosition().y < slowBtn.y + slowBtn.height){
+                    DrawRectangleLines(slowBtn.x, slowBtn.y, slowBtn.width, slowBtn.height ,RED);
+                }
+            
+            if(GetMousePosition().x > fastBtn.x && GetMousePosition().x < fastBtn.x + fastBtn.width &&
+                GetMousePosition().y > fastBtn.y && GetMousePosition().y < fastBtn.y + fastBtn.height &&
+                    IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
+                        speedVal = 5;
+                    }
+            if(GetMousePosition().x > fastBtn.x && GetMousePosition().x < fastBtn.x + fastBtn.width &&
+                GetMousePosition().y > fastBtn.y && GetMousePosition().y < fastBtn.y + fastBtn.height){
+                    DrawRectangleLines(fastBtn.x, fastBtn.y, fastBtn.width, fastBtn.height ,RED);
+                }
+            
+            if(GetMousePosition().x > superSpeedyBtn.x && GetMousePosition().x < superSpeedyBtn.x + superSpeedyBtn.width &&
+                GetMousePosition().y > superSpeedyBtn.y && GetMousePosition().y < superSpeedyBtn.y + superSpeedyBtn.height &&
+                    IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
+                        speedVal = 2;
+                    }
+            if(GetMousePosition().x > superSpeedyBtn.x && GetMousePosition().x < superSpeedyBtn.x + superSpeedyBtn.width &&
+                GetMousePosition().y > superSpeedyBtn.y && GetMousePosition().y < superSpeedyBtn.y + superSpeedyBtn.height){
+                    DrawRectangleLines(superSpeedyBtn.x, superSpeedyBtn.y, superSpeedyBtn.width, superSpeedyBtn.height ,RED);
+                }
+        }
+        else{
             ClearBackground(BLACK);
             //if(snakeSize == 0){
                 //player[0].Draw();
@@ -116,6 +201,7 @@ int main(void)
             if(gameOver){
                 DrawText("GAME OVER", screenWidth/2 -60, screenHeight/2,20, RED);
             }
+        }
 
 
 
