@@ -5,6 +5,8 @@ Snake::Snake(Vector2 pos, Vector2 sz, Color c)
     size(sz),
     color(c){}
 
+Snake::Snake(): position({0,0}), size({0,0}), color(BLANK) {}
+
 void Snake::Draw(){
     DrawRectangleV(position, size, color);
 }
@@ -14,9 +16,15 @@ void Snake::Move(Vector2 offset){
     position.y += offset.y;
 }
 
+void Snake::SetPosition(Vector2 linkPosition){
+     position.x = linkPosition.x;
+     position.y = linkPosition.y;
+}
+
 Vector2 Snake::GetPosition() const{
     return position;
 }
+
 
 Vector2 Snake::GetSize() const{
     return size;

@@ -11,9 +11,14 @@ void Treats::Draw(){
     DrawRectangleV(position, size, color);
 }
 
-//void Treats::Update(){
-//    position.y += speed;
-//}
+Vector2 Treats::GetPosition() const{
+    return position;
+}
+
+void Treats::newTreatLoc(Vector2 offset){
+    position.x = offset.x;
+    position.y = offset.y;
+}
 
 //bool Treats::CheckCollision(Vector2 ballPosition, float ballRadius){
 //    Rectangle TreatsRect = {position.x, position.y, size.x, size.y};

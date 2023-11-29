@@ -15,9 +15,9 @@ class Treats{
 
     void Draw();
 
-    //void Update();
+    Vector2 GetPosition() const;
 
-    //bool CheckCollision(Vector2 ballPosition, float ballRadius);
+    void newTreatLoc(Vector2 offset);
 
     //bool IsOutOfScreen(); 
 };

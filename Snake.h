@@ -11,10 +11,13 @@ class Snake{
 
     public:
     Snake(Vector2 pos, Vector2 sz, Color c);
+    Snake();
 
     void Draw();
 
     void Move(Vector2 offset);
+
+    void SetPosition(Vector2 linkPosition);
 
     Vector2 GetPosition() const;
 
