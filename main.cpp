@@ -25,7 +25,11 @@ int main(void)
     bool singleKeyPress = true;
     bool gameOver = false;
     bool gameStart = false;
-    bool snakeGrow = false;
+    bool hardBorder = false;
+    bool softBorder = false;
+    bool slowBorder = false;
+    bool fastBorder = false;
+    bool superSpeedyBorder = false;
     int frameCount = 0;
     float actorSize = 20.0f;
     int snakeSize = 2000;
@@ -140,7 +144,8 @@ int main(void)
             if(GetMousePosition().x > hardBtn.x && GetMousePosition().x < hardBtn.x + hardBtn.width &&
                 GetMousePosition().y > hardBtn.y && GetMousePosition().y < hardBtn.y + hardBtn.height &&
                     IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
-                        gameStart = true;
+                        hardBorder = true;
+                        softBorder = false;
                     }
             if(GetMousePosition().x > hardBtn.x && GetMousePosition().x < hardBtn.x + hardBtn.width &&
                 GetMousePosition().y > hardBtn.y && GetMousePosition().y < hardBtn.y + hardBtn.height){
@@ -150,7 +155,8 @@ int main(void)
             if(GetMousePosition().x > softBtn.x && GetMousePosition().x < softBtn.x + softBtn.width &&
                 GetMousePosition().y > softBtn.y && GetMousePosition().y < softBtn.y + softBtn.height &&
                     IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
-                        gameStart = true;
+                        hardBorder = false;
+                        softBorder = true;
                     }
             if(GetMousePosition().x > softBtn.x && GetMousePosition().x < softBtn.x + softBtn.width &&
                 GetMousePosition().y > softBtn.y && GetMousePosition().y < softBtn.y + softBtn.height){
@@ -161,6 +167,9 @@ int main(void)
                 GetMousePosition().y > slowBtn.y && GetMousePosition().y < slowBtn.y + slowBtn.height &&
                     IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
                         speedVal = 10;
+                        slowBorder = true;
+                        fastBorder = false;
+                        superSpeedyBorder = false;
                     }
             if(GetMousePosition().x > slowBtn.x && GetMousePosition().x < slowBtn.x + slowBtn.width &&
                 GetMousePosition().y > slowBtn.y && GetMousePosition().y < slowBtn.y + slowBtn.height){
@@ -171,6 +180,9 @@ int main(void)
                 GetMousePosition().y > fastBtn.y && GetMousePosition().y < fastBtn.y + fastBtn.height &&
                     IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
                         speedVal = 5;
+                        slowBorder = false;
+                        fastBorder = true;
+                        superSpeedyBorder = false;
                     }
             if(GetMousePosition().x > fastBtn.x && GetMousePosition().x < fastBtn.x + fastBtn.width &&
                 GetMousePosition().y > fastBtn.y && GetMousePosition().y < fastBtn.y + fastBtn.height){
@@ -181,19 +193,32 @@ int main(void)
                 GetMousePosition().y > superSpeedyBtn.y && GetMousePosition().y < superSpeedyBtn.y + superSpeedyBtn.height &&
                     IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
                         speedVal = 2;
+                        slowBorder = false;
+                        fastBorder = false;
+                        superSpeedyBorder = true;
                     }
             if(GetMousePosition().x > superSpeedyBtn.x && GetMousePosition().x < superSpeedyBtn.x + superSpeedyBtn.width &&
                 GetMousePosition().y > superSpeedyBtn.y && GetMousePosition().y < superSpeedyBtn.y + superSpeedyBtn.height){
                     DrawRectangleLines(superSpeedyBtn.x, superSpeedyBtn.y, superSpeedyBtn.width, superSpeedyBtn.height ,RED);
                 }
+                
+            if(slowBorder == true){
+                DrawRectangleLines(slowBtn.x, slowBtn.y, slowBtn.width, slowBtn.height ,RED);
+            } else if(fastBorder == true){
+                DrawRectangleLines(fastBtn.x, fastBtn.y, fastBtn.width, fastBtn.height ,RED);
+            } else if(superSpeedyBorder == true){            
+                DrawRectangleLines(superSpeedyBtn.x, superSpeedyBtn.y, superSpeedyBtn.width, superSpeedyBtn.height ,RED);
+            }
+            if(softBorder == true){
+                DrawRectangleLines(softBtn.x, softBtn.y, softBtn.width, softBtn.height ,RED);
+            } else if(hardBorder == true){
+                DrawRectangleLines(hardBtn.x, hardBtn.y, hardBtn.width, hardBtn.height ,RED);
+            }
         }
         else{
             ClearBackground(BLACK);
-            //if(snakeSize == 0){
-                //player[0].Draw();
-            //    DrawRectangleV(player[0].GetPosition,player[0].GetSize,RAYWHITE);
+
             for(int i = 0; i < snakeLength; i++){
-                //player[i].Draw();
                 DrawRectangleV(player[i].GetPosition(), {actorSize,actorSize}, RAYWHITE);
             }
             tastyTreat.Draw();
@@ -201,9 +226,9 @@ int main(void)
             if(gameOver){
                 DrawText("GAME OVER", screenWidth/2 -60, screenHeight/2,20, RED);
             }
+
+            
         }
-
-
 
         EndDrawing();
         //----------------------------------------------------------------------------------
