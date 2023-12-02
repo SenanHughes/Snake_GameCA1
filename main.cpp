@@ -279,9 +279,9 @@ int main(void)
                 DrawRectangleV(player[i].GetPosition(), {actorSize,actorSize}, RAYWHITE);
             }
             
-            tastyTreat.Draw();
-            //DrawTextureEx(tastyAppleTexture, {screenWidth/2.0f,screenHeight/2.0f}, 0.0f, 1.25f,WHITE);
-            DrawTextureRec(tastyAppleTexture, actorSize, tastyTreat.GetPosition(), WHITE);
+            //tastyTreat.Draw();
+            DrawTextureEx(tastyAppleTexture, {screenWidth/2.0f,screenHeight/2.0f}, 0.0f, 1.25f,WHITE);
+            //DrawTextureRec(tastyAppleTexture, {0,0,0,0}, tastyTreat.GetPosition(), WHITE);
 
             if(hardMode){
                 DrawRectangleLinesEx(hardWalls,3.0f, RED);
