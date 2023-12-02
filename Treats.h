@@ -8,9 +8,11 @@ class Treats{
     Vector2 position;
     Vector2 size;
     Color color; 
-
+    //Texture2D texture;
+    
     public:
     Treats(Vector2 pos, Vector2 sz, Color c);
+    //Treats(Texture2D texture, Vector2 pos, Vector2 sz, Color c);
 
     void Draw();
 
