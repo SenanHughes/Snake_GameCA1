@@ -31,6 +31,7 @@ int main(void)
     Vector2 snakeDirection = {0,0};                         // intialising direction the snake moves
     Vector2 previousSnakeSection[snakeSize] = {0,0};        // initialising the holder for previous snake positions
     
+    InitWindow(screenWidth, screenHeight, "SNAKE");         // starts the game window
     Texture2D tastyAppleTexture = LoadTexture("Resources/Textures/apple.png");
 
     Snake player[snakeSize];
@@ -43,16 +44,12 @@ int main(void)
     }
 
     // randomly positions the starting treat position
-    Treats tastyTreat({GetRandomValue(0, (screenWidth/actorSize)-1)*actorSize, GetRandomValue(0, (screenHeight/actorSize)-1)*actorSize}
+    Treats tastyTreat(tastyAppleTexture
+                        , {GetRandomValue(0, (screenWidth/actorSize)-1)*actorSize, GetRandomValue(0, (screenHeight/actorSize)-1)*actorSize}
                         , {20,20}
                         , PINK);
-    //Treats tastyTreat(tastyAppleTexture
-                        //, {GetRandomValue(0, (screenWidth/actorSize)-1)*actorSize, GetRandomValue(0, (screenHeight/actorSize)-1)*actorSize}
-                        //, {20,20}
-                        //, PINK);
 
-    InitWindow(screenWidth, screenHeight, "SNAKE");         // starts the game window
-
+    
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
     //--------------------------------------------------------------------------------------
     
@@ -279,10 +276,8 @@ int main(void)
                 DrawRectangleV(player[i].GetPosition(), {actorSize,actorSize}, RAYWHITE);
             }
             
-            //tastyTreat.Draw();
-            DrawTextureEx(tastyAppleTexture, {screenWidth/2.0f,screenHeight/2.0f}, 0.0f, 1.25f,WHITE);
-            //DrawTextureRec(tastyAppleTexture, {0,0,0,0}, tastyTreat.GetPosition(), WHITE);
-
+            tastyTreat.Draw();
+            
             if(hardMode){
                 DrawRectangleLinesEx(hardWalls,3.0f, RED);
             }
