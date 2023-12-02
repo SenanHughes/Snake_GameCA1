@@ -21,9 +21,11 @@ void Snake::SetPosition(Vector2 linkPosition){
      position.y = linkPosition.y;
 }
 
-void Snake::movingDir(bool isUpDown, bool isLeftRight){
-    upDownDir = isUpDown;
-    leftRightDir = isLeftRight;
+void Snake::movingDir(bool isUp, bool isLeft, bool isDown, bool isRight){
+    upDir = isUp;
+    leftDir = isLeft;
+    downDir = isDown;
+    rightDir = isRight;
 }
 
 Vector2 Snake::GetPosition() const{
@@ -34,10 +36,18 @@ Vector2 Snake::GetSize() const{
     return size;
 }
 
-bool Snake::returnUpDown() const{
-    return upDownDir;
+bool Snake::returnDown() const{
+    return downDir;
 }
 
-bool Snake::returnLeftRight() const{
-    return leftRightDir;
+bool Snake::returnLeft() const{
+    return leftDir;
+}
+
+bool Snake::returnUp() const{
+    return upDir;
+}
+
+bool Snake::returnRight() const{
+    return rightDir;
 }

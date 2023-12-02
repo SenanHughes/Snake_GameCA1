@@ -8,8 +8,10 @@ class Snake{
     Vector2 position;
     Vector2 size;
     Color color;
-    bool upDownDir;
-    bool leftRightDir;
+    bool upDir;
+    bool leftDir;
+    bool downDir;
+    bool rightDir;
 
     public:
     Snake(Vector2 pos, Vector2 sz, Color c);
@@ -21,11 +23,15 @@ class Snake{
 
     void SetPosition(Vector2 linkPosition);
 
-    void movingDir(bool isUpDown, bool isLeftRight);
+    void movingDir(bool isUp, bool isLeft, bool isDown, bool isRight);
 
-    bool returnUpDown() const;
+    bool returnDown() const;
 
-    bool returnLeftRight() const;
+    bool returnLeft() const;
+
+    bool returnUp() const;
+
+    bool returnRight() const;
 
     Vector2 GetPosition() const;
 

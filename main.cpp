@@ -23,8 +23,10 @@ int main(void)
     bool slowBorder = true;                                 // if slow speed is selected
     bool fastBorder = false;                                // if fast speed is selected
     bool superSpeedyBorder = false;                         // if super speedy speed is selected
-    bool upDown = false;
-    bool leftRight = false;
+    bool up = false;
+    bool left = false;
+    bool down = false;
+    bool right = false;
     int frameCount = 0;                                     // initialises the frame count at 0
     float actorSize = 20.0f;                                // sets the size of the snake sections
     int snakeSize = (screenHeight*screenWidth)/actorSize;   // initialises the total size the snake could grow to - ratio of total screen pixels against snake section size
@@ -32,8 +34,10 @@ int main(void)
     int speedVal = 10;                                      // initialising snake speed
     Vector2 snakeDirection = {0,0};                         // intialising direction the snake moves
     Vector2 previousSnakeSection[snakeSize] = {0,0};        // initialising the holder for previous snake positions
-    bool previousSnakeUpDown[snakeSize] = {false};
-    bool previousSnakeLeftRight[snakeSize] = {false};
+    bool previousSnakeUp[snakeSize] = {false};
+    bool previousSnakeLeft[snakeSize] = {false};
+    bool previousSnakeDown[snakeSize] = {false};
+    bool previousSnakeRight[snakeSize] = {false};
     
     InitWindow(screenWidth, screenHeight, "SNAKE");         // starts the game window
     
@@ -79,36 +83,46 @@ int main(void)
             if(IsKeyPressed(KEY_UP) && snakeDirection.y == 0 && singleKeyPress){
             snakeDirection = {0,-actorSize};
             singleKeyPress = false; // this bool prevents the keys being pressed so fast that the snake would move backwards along it's current line
-            upDown = true;
-            leftRight = false;
+            up = true;
+            left = false;
+            down = false;
+            right = false;
             }
 
             if(IsKeyPressed(KEY_DOWN) && snakeDirection.y == 0 && singleKeyPress){
             snakeDirection = {0,actorSize};
             singleKeyPress = false;
-            upDown = true;
-            leftRight = false;
+            up = false;
+            left = false;
+            down = true;
+            right = false;
             }
 
             if(IsKeyPressed(KEY_LEFT) && snakeDirection.x == 0 && singleKeyPress){
             snakeDirection = {-actorSize, 0};
             singleKeyPress = false;
-            upDown = false;
-            leftRight = true;
+            up = false;
+            left = true;
+            down = false;
+            right = false;
             }
 
             if(IsKeyPressed(KEY_RIGHT) && snakeDirection.x == 0 && singleKeyPress){
             snakeDirection = {actorSize, 0};
             singleKeyPress = false;
-            upDown = false;
-            leftRight = true;
+            up = false;
+            left = false;
+            down = false;
+            right = true;
             }
 
             // assigns the position for each section of the snake to a temporary variable before the snake moves to allow each section to follow correctly
             for(int i = 0; i < snakeLength; i++){
                 previousSnakeSection[i] = player[i].GetPosition();
-                previousSnakeUpDown[i] = player[i].returnUpDown();
-                previousSnakeLeftRight[i] = player[i].returnLeftRight();
+                previousSnakeUp[i] = player[i].returnUp();
+                previousSnakeLeft[i] = player[i].returnLeft();
+                previousSnakeDown[i] = player[i].returnDown();
+                previousSnakeRight[i] = player[i].returnRight();
             }
 
             // waits for modulus of frame count and speed value to update the movement of the snake to give it the step by step movement the game had
@@ -116,11 +130,12 @@ int main(void)
                 for(int i = 0; i < snakeLength; i++){
                     if(i == 0){
                         player[i].Move(snakeDirection); // the head moves along the direction denoted in the above move section
-                        player[i].movingDir(upDown, leftRight);
+                        player[i].movingDir(up, left, down, right);
                     }
                     else{
                         player[i].SetPosition(previousSnakeSection[i-1]); // the body follows the position of the previous body portion
-                        player[i].movingDir(previousSnakeUpDown[i-1], previousSnakeLeftRight[i-1]);
+                        player[i].movingDir(previousSnakeUp[i-1], previousSnakeLeft[i-1], 
+                                            previousSnakeDown[i-1], previousSnakeRight[i-1]);
                     }
                 }
                 singleKeyPress = true;
@@ -296,7 +311,6 @@ int main(void)
         // Draws the game screen - snake moving, treats generated and walls to denote the hard wall variant if relevant
         else if(!gameOver){
             ClearBackground(BLACK);
-            DrawText(TextFormat("%d",player[1].returnLeftRight()),60,100,50,RED);
             for(int i = 0; i < snakeLength; i++){
                 if(i == 0){
                     if(snakeDirection.y > 0){
@@ -328,104 +342,67 @@ int main(void)
                                         90.0f, 
                                         WHITE);
                     } 
-                } else if(i > 0 && i != snakeLength - 1){ 
-                    if(player[i].GetPosition().x - player[i-1].GetPosition().x == 0 || 
-                                player[i].GetPosition().y - player[i-1].GetPosition().y == 0){
-                        if(player[i].GetPosition().y - player[i-1].GetPosition().y < 0){
-                            DrawTexturePro(snakeBodyTexture, 
-                                            (Rectangle){0, 0, (float)snakeBodyTexture.width, (float)snakeBodyTexture.height}, 
-                                            (Rectangle){player[i].GetPosition().x+snakeBodyTexture.width/2.0f, player[i].GetPosition().y+snakeBodyTexture.height/2.0f,snakeBodyTexture.width,snakeBodyTexture.height}, 
-                                            {snakeBodyTexture.width/2.0f,snakeBodyTexture.height/2.0f}, 
-                                            0.0f, 
-                                            WHITE);
-                        } else if(player[i].GetPosition().y - player[i-1].GetPosition().y > 0){
-                            DrawTexturePro(snakeBodyTexture, 
-                                            (Rectangle){0, 0, snakeBodyTexture.width,snakeBodyTexture.height}, 
-                                            (Rectangle){player[i].GetPosition().x+snakeBodyTexture.width/2.0f, player[i].GetPosition().y+snakeBodyTexture.height/2.0f,snakeBodyTexture.width,snakeBodyTexture.height}, 
-                                            {snakeBodyTexture.width/2.0f,snakeBodyTexture.height/2.0f}, 
-                                            180.0f, 
-                                            WHITE);
-                        } else if(player[i].GetPosition().x - player[i-1].GetPosition().x > 0){
-                            DrawTexturePro(snakeBodyTexture, 
-                                            (Rectangle){0, 0,snakeBodyTexture.width,snakeBodyTexture.height}, 
-                                            (Rectangle){player[i].GetPosition().x+snakeBodyTexture.width/2.0f, player[i].GetPosition().y+snakeBodyTexture.height/2.0f,snakeBodyTexture.width,snakeBodyTexture.height}, 
-                                            {snakeBodyTexture.width/2.0f,snakeBodyTexture.height/2.0f}, 
-                                            90.0f, 
-                                            WHITE);
-                        } else{
-                            DrawTexturePro(snakeBodyTexture, 
-                                            (Rectangle){0, 0,snakeBodyTexture.width,snakeBodyTexture.height}, 
-                                            (Rectangle){player[i].GetPosition().x+snakeBodyTexture.width/2.0f, player[i].GetPosition().y+snakeBodyTexture.height/2.0f,snakeBodyTexture.width,snakeBodyTexture.height}, 
-                                            {snakeBodyTexture.width/2.0f,snakeBodyTexture.height/2.0f}, 
-                                            270.0f, 
-                                            WHITE);
-                        }
-                    } else if(player[i].returnLeftRight() == true) {
-                        if(player[i].GetPosition().y - player[i-1].GetPosition().y > 0 &&
-                            player[i].GetPosition().x - player[i-1].GetPosition().x < 0){
-                            DrawTexturePro(snakeBodyTurnTexture, 
-                                            (Rectangle){0, 0, (float)snakeBodyTurnTexture.width, (float)snakeBodyTurnTexture.height}, 
-                                            (Rectangle){player[i].GetPosition().x+snakeBodyTurnTexture.width/2.0f, player[i].GetPosition().y+snakeBodyTurnTexture.height/2.0f,snakeBodyTurnTexture.width,snakeBodyTurnTexture.height}, 
-                                            {snakeBodyTurnTexture.width/2.0f,snakeBodyTurnTexture.height/2.0f}, 
-                                            0.0f, 
-                                            WHITE);
-                        } else if(player[i].GetPosition().y - player[i-1].GetPosition().y < 0 &&
-                            player[i].GetPosition().x - player[i-1].GetPosition().x > 0){
-                            DrawTexturePro(snakeBodyTurnTexture, 
-                                            (Rectangle){0, 0, snakeBodyTurnTexture.width,snakeBodyTurnTexture.height}, 
-                                            (Rectangle){player[i].GetPosition().x+snakeBodyTurnTexture.width/2.0f, player[i].GetPosition().y+snakeBodyTurnTexture.height/2.0f,snakeBodyTurnTexture.width,snakeBodyTurnTexture.height}, 
-                                            {snakeBodyTurnTexture.width/2.0f,snakeBodyTurnTexture.height/2.0f}, 
-                                            180.0f, 
-                                            WHITE);
-                        } else if(player[i].GetPosition().y - player[i-1].GetPosition().y > 0 &&
-                            player[i].GetPosition().x - player[i-1].GetPosition().x > 0){
-                            DrawTexturePro(snakeBodyTurnTexture, 
-                                            (Rectangle){0, 0,snakeBodyTurnTexture.width,snakeBodyTurnTexture.height}, 
-                                            (Rectangle){player[i].GetPosition().x+snakeBodyTurnTexture.width/2.0f, player[i].GetPosition().y+snakeBodyTurnTexture.height/2.0f,snakeBodyTurnTexture.width,snakeBodyTurnTexture.height}, 
-                                            {snakeBodyTurnTexture.width/2.0f,snakeBodyTurnTexture.height/2.0f}, 
-                                            90.0f, 
-                                            WHITE);
-                        } else{
-                            DrawTexturePro(snakeBodyTurnTexture, 
-                                            (Rectangle){0, 0,snakeBodyTurnTexture.width,snakeBodyTurnTexture.height}, 
-                                            (Rectangle){player[i].GetPosition().x+snakeBodyTurnTexture.width/2.0f, player[i].GetPosition().y+snakeBodyTurnTexture.height/2.0f,snakeBodyTurnTexture.width,snakeBodyTurnTexture.height}, 
-                                            {snakeBodyTurnTexture.width/2.0f,snakeBodyTurnTexture.height/2.0f}, 
-                                            270.0f, 
-                                            WHITE);
-                        }
-                    } else {
-                        if(player[i].GetPosition().y - player[i-1].GetPosition().y < 0 &&
-                            player[i].GetPosition().x - player[i-1].GetPosition().x > 0){
-                            DrawTexturePro(snakeBodyTurnTexture, 
-                                            (Rectangle){0, 0, (float)snakeBodyTurnTexture.width, (float)snakeBodyTurnTexture.height}, 
-                                            (Rectangle){player[i].GetPosition().x+snakeBodyTurnTexture.width/2.0f, player[i].GetPosition().y+snakeBodyTurnTexture.height/2.0f,snakeBodyTurnTexture.width,snakeBodyTurnTexture.height}, 
-                                            {snakeBodyTurnTexture.width/2.0f,snakeBodyTurnTexture.height/2.0f}, 
-                                            0.0f, 
-                                            WHITE);
-                        } else if(player[i].GetPosition().y - player[i-1].GetPosition().y > 0 &&
-                            player[i].GetPosition().x - player[i-1].GetPosition().x < 0){
-                            DrawTexturePro(snakeBodyTurnTexture, 
-                                            (Rectangle){0, 0, snakeBodyTurnTexture.width,snakeBodyTurnTexture.height}, 
-                                            (Rectangle){player[i].GetPosition().x+snakeBodyTurnTexture.width/2.0f, player[i].GetPosition().y+snakeBodyTurnTexture.height/2.0f,snakeBodyTurnTexture.width,snakeBodyTurnTexture.height}, 
-                                            {snakeBodyTurnTexture.width/2.0f,snakeBodyTurnTexture.height/2.0f}, 
-                                            180.0f, 
-                                            WHITE);
-                        } else if(player[i].GetPosition().y - player[i-1].GetPosition().y < 0 &&
-                            player[i].GetPosition().x - player[i-1].GetPosition().x < 0){
-                            DrawTexturePro(snakeBodyTurnTexture, 
-                                            (Rectangle){0, 0,snakeBodyTurnTexture.width,snakeBodyTurnTexture.height}, 
-                                            (Rectangle){player[i].GetPosition().x+snakeBodyTurnTexture.width/2.0f, player[i].GetPosition().y+snakeBodyTurnTexture.height/2.0f,snakeBodyTurnTexture.width,snakeBodyTurnTexture.height}, 
-                                            {snakeBodyTurnTexture.width/2.0f,snakeBodyTurnTexture.height/2.0f}, 
-                                            90.0f, 
-                                            WHITE);
-                        } else{
-                            DrawTexturePro(snakeBodyTurnTexture, 
-                                            (Rectangle){0, 0,snakeBodyTurnTexture.width,snakeBodyTurnTexture.height}, 
-                                            (Rectangle){player[i].GetPosition().x+snakeBodyTurnTexture.width/2.0f, player[i].GetPosition().y+snakeBodyTurnTexture.height/2.0f,snakeBodyTurnTexture.width,snakeBodyTurnTexture.height}, 
-                                            {snakeBodyTurnTexture.width/2.0f,snakeBodyTurnTexture.height/2.0f}, 
-                                            270.0f, 
-                                            WHITE);
-                        }
+                } else if(i > 0 && i != snakeLength - 1){
+                    if(player[i].returnDown() && player[i-1].returnDown()){
+                        DrawTexturePro(snakeBodyTexture, 
+                                        (Rectangle){0, 0, (float)snakeBodyTexture.width, (float)snakeBodyTexture.height}, 
+                                        (Rectangle){player[i].GetPosition().x+snakeBodyTexture.width/2.0f, player[i].GetPosition().y+snakeBodyTexture.height/2.0f,snakeBodyTexture.width,snakeBodyTexture.height}, 
+                                        {snakeBodyTexture.width/2.0f,snakeBodyTexture.height/2.0f}, 
+                                        0.0f, 
+                                        WHITE);
+                    } else if(player[i].returnLeft() && player[i-1].returnLeft()){
+                        DrawTexturePro(snakeBodyTexture, 
+                                        (Rectangle){0, 0, snakeBodyTexture.width,snakeBodyTexture.height}, 
+                                        (Rectangle){player[i].GetPosition().x+snakeBodyTexture.width/2.0f, player[i].GetPosition().y+snakeBodyTexture.height/2.0f,snakeBodyTexture.width,snakeBodyTexture.height}, 
+                                        {snakeBodyTexture.width/2.0f,snakeBodyTexture.height/2.0f}, 
+                                        90.0f, 
+                                        WHITE);
+                    } else if(player[i].returnUp() && player[i-1].returnUp()){
+                        DrawTexturePro(snakeBodyTexture, 
+                                        (Rectangle){0, 0,snakeBodyTexture.width,snakeBodyTexture.height}, 
+                                        (Rectangle){player[i].GetPosition().x+snakeBodyTexture.width/2.0f, player[i].GetPosition().y+snakeBodyTexture.height/2.0f,snakeBodyTexture.width,snakeBodyTexture.height}, 
+                                        {snakeBodyTexture.width/2.0f,snakeBodyTexture.height/2.0f}, 
+                                        180.0f, 
+                                        WHITE);
+                    } else if(player[i].returnRight() && player[i-1].returnRight()){
+                        DrawTexturePro(snakeBodyTexture, 
+                                        (Rectangle){0, 0,snakeBodyTexture.width,snakeBodyTexture.height}, 
+                                        (Rectangle){player[i].GetPosition().x+snakeBodyTexture.width/2.0f, player[i].GetPosition().y+snakeBodyTexture.height/2.0f,snakeBodyTexture.width,snakeBodyTexture.height}, 
+                                        {snakeBodyTexture.width/2.0f,snakeBodyTexture.height/2.0f}, 
+                                        270.0f, 
+                                        WHITE);
+                    } else if((player[i].returnRight() && player[i-1].returnDown()) 
+                        || (player[i].returnUp() && player[i-1].returnLeft())){
+                        DrawTexturePro(snakeBodyTurnTexture, 
+                                        (Rectangle){0, 0, (float)snakeBodyTurnTexture.width, (float)snakeBodyTurnTexture.height}, 
+                                        (Rectangle){player[i].GetPosition().x+snakeBodyTurnTexture.width/2.0f, player[i].GetPosition().y+snakeBodyTurnTexture.height/2.0f,snakeBodyTurnTexture.width,snakeBodyTurnTexture.height}, 
+                                        {snakeBodyTurnTexture.width/2.0f,snakeBodyTurnTexture.height/2.0f}, 
+                                        0.0f, 
+                                        WHITE);
+                    } else if((player[i].returnLeft() && player[i-1].returnUp()) 
+                        || (player[i].returnDown() && player[i-1].returnRight())){
+                        DrawTexturePro(snakeBodyTurnTexture, 
+                                        (Rectangle){0, 0, snakeBodyTurnTexture.width,snakeBodyTurnTexture.height}, 
+                                        (Rectangle){player[i].GetPosition().x+snakeBodyTurnTexture.width/2.0f, player[i].GetPosition().y+snakeBodyTurnTexture.height/2.0f,snakeBodyTurnTexture.width,snakeBodyTurnTexture.height}, 
+                                        {snakeBodyTurnTexture.width/2.0f,snakeBodyTurnTexture.height/2.0f}, 
+                                        180.0f, 
+                                        WHITE);
+                    } else if((player[i].returnLeft() && player[i-1].returnDown()) 
+                        || (player[i].returnUp() && player[i-1].returnRight())){
+                        DrawTexturePro(snakeBodyTurnTexture, 
+                                        (Rectangle){0, 0,snakeBodyTurnTexture.width,snakeBodyTurnTexture.height}, 
+                                        (Rectangle){player[i].GetPosition().x+snakeBodyTurnTexture.width/2.0f, player[i].GetPosition().y+snakeBodyTurnTexture.height/2.0f,snakeBodyTurnTexture.width,snakeBodyTurnTexture.height}, 
+                                        {snakeBodyTurnTexture.width/2.0f,snakeBodyTurnTexture.height/2.0f}, 
+                                        270.0f, 
+                                        WHITE);
+                    } else if((player[i].returnRight() && player[i-1].returnUp()) 
+                        || (player[i].returnDown() && player[i-1].returnLeft())){
+                        DrawTexturePro(snakeBodyTurnTexture, 
+                                        (Rectangle){0, 0,snakeBodyTurnTexture.width,snakeBodyTurnTexture.height}, 
+                                        (Rectangle){player[i].GetPosition().x+snakeBodyTurnTexture.width/2.0f, player[i].GetPosition().y+snakeBodyTurnTexture.height/2.0f,snakeBodyTurnTexture.width,snakeBodyTurnTexture.height}, 
+                                        {snakeBodyTurnTexture.width/2.0f,snakeBodyTurnTexture.height/2.0f}, 
+                                        90.0f, 
+                                        WHITE);
                     }
                 } else if(i == snakeLength - 1){
                     if(player[i].GetPosition().y - player[i-1].GetPosition().y < 0){
