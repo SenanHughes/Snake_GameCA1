@@ -2,6 +2,8 @@
 
 This is a recreation of the classic game Snake.
 
+Youtube Game Demonstration & Explanation - https://youtu.be/yIeFpG3saS4
+
 **Features include:**
 - Selectable Hard or Soft Walls
 - Three Selectable Speeds for the Snake
