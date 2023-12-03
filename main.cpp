@@ -15,6 +15,8 @@ int main(void)
     Rectangle superSpeedyBtn = {490,395,445,65};                                // border size for Super Speedy Button on Start screen
     Rectangle startBtn = {(float)(screenWidth/2) - 190, 595, 380, 105};         // border size for Start Button on Start screen
     Rectangle hardWalls = {0, 0, (float)screenWidth, (float)screenHeight};      // border size for the Hard Walls within the Game
+    Rectangle yBtn = {385, 485, 60, 60};
+    Rectangle nBtn = {570, 485, 60, 60};
     bool singleKeyPress = true;                             // limit key presses within each snake movement
     bool gameOver = false;                                  // denote the end of game
     bool gameStart = false;                                 // denote the start of the game
@@ -32,6 +34,7 @@ int main(void)
     int snakeSize = (screenHeight*screenWidth)/actorSize;   // initialises the total size the snake could grow to - ratio of total screen pixels against snake section size
     int snakeLength = 1;                                    // intial snake size
     int speedVal = 10;                                      // initialising snake speed
+    int tongueAnim = 0;
     Vector2 snakeDirection = {0,0};                         // intialising direction the snake moves
     Vector2 previousSnakeSection[snakeSize] = {0,0};        // initialising the holder for previous snake positions
     bool previousSnakeUp[snakeSize] = {false};
@@ -40,6 +43,7 @@ int main(void)
     bool previousSnakeRight[snakeSize] = {false};
     
     InitWindow(screenWidth, screenHeight, "SNAKE");         // starts the game window
+    InitAudioDevice();
     
     //LoadingTextures in 
     Texture2D tastyAppleTexture = LoadTexture("Resources/Textures/apple.png");
@@ -50,7 +54,11 @@ int main(void)
     Texture2D snakeBodyTexture = LoadTexture("Resources/Textures/snakeBody.png");
     Texture2D snakeTailTexture = LoadTexture("Resources/Textures/snakeTail.png");
     Texture2D snakeBodyTurnTexture = LoadTexture("Resources/Textures/snakeBodyTurn.png");
+    Texture2D groundBackground = LoadTexture("Resources/Textures/groundTexture.png");
+    Texture2D snakeHeadAnim = snakeHead1Texture;
+    int tonguePos = 0;
 
+    
     Snake player[snakeSize];
 
     for(int i = 0; i < snakeSize; i++){
@@ -65,20 +73,70 @@ int main(void)
                         , {GetRandomValue(0, (screenWidth/actorSize)-1)*actorSize, GetRandomValue(0, (screenHeight/actorSize)-1)*actorSize}
                         , {20,20}
                         , PINK);
+    while(tastyTreat.GetPosition().x == screenWidth/2.0f && tastyTreat.GetPosition().y == screenHeight/2.0f){
+        tastyTreat.newTreatLoc({GetRandomValue(0, (screenWidth/actorSize)-1)*actorSize, GetRandomValue(0, (screenHeight/actorSize)-1)*actorSize});
+    }
 
     
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
     //--------------------------------------------------------------------------------------
+    ClearBackground(RAYWHITE);
+    DrawText("Loading...", screenWidth/2 - 180, screenHeight/2 - 20, 60, BLACK);
+        
+    Music menuTrack = LoadMusicStream("Resources/Music/Pleasant_Creek_Loop.wav");
+    Music gameTrack = LoadMusicStream("Resources/Music/Juhani_Junkala_[Chiptune Adventures]_2_Stage2.wav");
     
+    Sound eatingTreats = LoadSound("Resources/soundEffects/crunch3.wav");
+    Sound gameOverSound = LoadSound("Resources/soundEffects/GameOver.wav");
+
+    while (!IsMusicReady(gameTrack) && !IsMusicReady(menuTrack) && !IsSoundReady(eatingTreats)){
+        ClearBackground(RAYWHITE);
+        DrawText("Loading...", screenWidth/2 - 180, screenHeight/2 - 20, 60, BLACK);
+    } 
     
     
 
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {   
+         
         // when gameOver hasn't been triggered and gameStart has been selected the main game begins
+        if(!gameOver && !gameStart){
+            if(!IsMusicStreamPlaying(menuTrack)){
+                PlayMusicStream(menuTrack);
+                SetMusicVolume(menuTrack, 1.0f);
+            }else {
+                UpdateMusicStream(menuTrack);
+            }
+
+        if(tongueAnim%10 == 0){
+            switch(tonguePos){
+                case 0:
+                    snakeHeadAnim = snakeHead1Texture;
+                    tonguePos++;
+                    break;
+                case 1:
+                    snakeHeadAnim = snakeHead2Texture;
+                    tonguePos++;
+                    break;
+                case 2:
+                    snakeHeadAnim = snakeHead3Texture;
+                    tonguePos = 0;
+                    break;
+                }
+            }
+        tongueAnim++;
+        }
+
         if(!gameOver && gameStart)
-        {
+        {   
+            StopMusicStream(menuTrack);
+            if(!IsMusicStreamPlaying(gameTrack)){
+                PlayMusicStream(gameTrack);
+                SetMusicVolume(gameTrack, 1.0f);
+            } else {
+                UpdateMusicStream(gameTrack);
+            }
             // the movement control of the snake - up and down are positive and negative versions of the size of the snake head, left and right copy the same concept
             if(IsKeyPressed(KEY_UP) && snakeDirection.y == 0 && singleKeyPress){
             snakeDirection = {0,-actorSize};
@@ -139,11 +197,27 @@ int main(void)
                     }
                 }
                 singleKeyPress = true;
+                switch(tonguePos){
+                    case 0:
+                        snakeHeadAnim = snakeHead1Texture;
+                        tonguePos++;
+                        break;
+                    case 1:
+                        snakeHeadAnim = snakeHead2Texture;
+                        tonguePos++;
+                        break;
+                    case 2:
+                        snakeHeadAnim = snakeHead3Texture;
+                        tonguePos = 0;
+                        break;
+                }
+                
             }
             
 
             // treat location generation when collected 
             if(player[0].GetPosition().x == tastyTreat.GetPosition().x && player[0].GetPosition().y == tastyTreat.GetPosition().y){
+                PlaySound(eatingTreats);
                 tastyTreat.newTreatLoc({GetRandomValue(0, (screenWidth/actorSize)-1)*actorSize, GetRandomValue(0, (screenHeight/actorSize)-1)*actorSize});
                 //condition to avoid placing the new treat where the snake body is
                 for(int i = 0; i < snakeLength; i++){
@@ -154,13 +228,13 @@ int main(void)
                 snakeLength++;
                 player[snakeLength].SetPosition(player[snakeLength-1].GetPosition());
             }
-
             // gameOver for the hard walls variant if the snake hits the wall
             if(hardMode && (player[0].GetPosition().y < 0 ||
                 player[0].GetPosition().y > screenHeight - player[0].GetSize().y||
                 player[0].GetPosition().x  < 0 ||
                 player[0].GetPosition().x > screenWidth - player[0].GetSize().x)){
                     gameOver = true;
+                    PlaySound(gameOverSound);
             }
 
             // no gameOver for soft walls variant, just teleports across from one side of the screen to the other
@@ -184,6 +258,7 @@ int main(void)
             for(int i = 1; i < snakeLength; i++){
                 if(player[0].GetPosition().x == player[i].GetPosition().x && player[0].GetPosition().y == player[i].GetPosition().y){
                     gameOver = true;
+                    PlaySound(gameOverSound);
                 }
             }
             frameCount++;
@@ -193,6 +268,10 @@ int main(void)
         // conditions for gameOver menu
         if(gameOver){
             // regardless of whether the player chooses to restart straight away or return to main menu these values get reinitialised
+            tastyTreat.newTreatLoc({GetRandomValue(0, (screenWidth/actorSize)-1)*actorSize, GetRandomValue(0, (screenHeight/actorSize)-1)*actorSize});
+            while(tastyTreat.GetPosition().x == screenWidth/2.0f && tastyTreat.GetPosition().y == screenHeight/2.0f){
+                tastyTreat.newTreatLoc({GetRandomValue(0, (screenWidth/actorSize)-1)*actorSize, GetRandomValue(0, (screenHeight/actorSize)-1)*actorSize});
+            }       
             singleKeyPress = true;
             frameCount = 0;
             actorSize = 20.0f;
@@ -207,9 +286,17 @@ int main(void)
                 player[i].SetPosition({-actorSize,-actorSize});
             }
             // if they choose to restart gameOver is the only condition to clear
-            if(IsKeyPressed(KEY_Y)){
+            if(IsKeyPressed(KEY_Y) || (GetMousePosition().x > yBtn.x && 
+                                        GetMousePosition().x < yBtn.x + yBtn.width && 
+                                        GetMousePosition().y > yBtn.y && 
+                                        GetMousePosition().y < yBtn.y + yBtn.height &&
+                                        IsMouseButtonPressed(MOUSE_BUTTON_LEFT))){
                 gameOver = false;
-            } else if(IsKeyPressed(KEY_N)){ // if they choose not to restart gameOver and gameStart are reset to return to main menu
+            } else if(IsKeyPressed(KEY_N) || (GetMousePosition().x > nBtn.x && 
+                                                GetMousePosition().x < nBtn.x + nBtn.width && 
+                                                GetMousePosition().y > nBtn.y && 
+                                                GetMousePosition().y < nBtn.y + nBtn.height &&
+                                                IsMouseButtonPressed(MOUSE_BUTTON_LEFT))){ // if they choose not to restart gameOver and gameStart are reset to return to main menu
                 gameStart = false;
                 gameOver = false;
             }
@@ -222,19 +309,23 @@ int main(void)
         if(!gameStart){
 
             // start menu creation
-            ClearBackground(RAYWHITE);
-            DrawText("Welcome to Snake", screenWidth/2-260, 60, 60, PINK);
-            DrawText("Hard Walls", 150, 240, 60, BLACK);
-            DrawText("Soft Walls", 550, 240, 60, BLACK);
-            DrawText("Slow", 80, 400, 60, BLACK);
-            DrawText("Fast", 280, 400, 60, BLACK);
-            DrawText("Super Speedy", 500, 400, 60, BLACK);
+            ClearBackground(BLANK);
+            DrawTexture(groundBackground,0,0,WHITE);
+            DrawText("Welcome to Snake", screenWidth/2-260, 60, 60, YELLOW);
+            DrawText("Hard Walls", 150, 240, 60, RAYWHITE);
+            DrawText("Soft Walls", 550, 240, 60, RAYWHITE);
+            DrawText("Slow", 80, 400, 60, RAYWHITE);
+            DrawText("Fast", 280, 400, 60, RAYWHITE);
+            DrawText("Super Speedy", 500, 400, 60, RAYWHITE);
             DrawText("START", screenWidth/2-180, 600, 100, GREEN);
-
+            
+            DrawTexture(snakeHeadAnim,500,160,WHITE);
+            DrawTexture(snakeBodyTexture,500,140,WHITE);
+            DrawTexture(snakeTailTexture,500,120,WHITE);
+            
             // while the mouse is somewhere within a box that covers the area of the text a red border box appears
             if(GetMousePosition().x > startBtn.x && GetMousePosition().x < startBtn.x + startBtn.width &&
                 GetMousePosition().y > startBtn.y && GetMousePosition().y < startBtn.y + startBtn.height){
-                    DrawRectangleLines(startBtn.x, startBtn.y, startBtn.width, startBtn.height ,RED);
                     // when the player left clicks over Start the game starts
                     if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
                         gameStart = true;
@@ -245,7 +336,6 @@ int main(void)
             // the difference is that when the button is clicked it sets a condition that impacts game play and also keeps the border around the text until gameStart
             if(GetMousePosition().x > hardBtn.x && GetMousePosition().x < hardBtn.x + hardBtn.width &&
                 GetMousePosition().y > hardBtn.y && GetMousePosition().y < hardBtn.y + hardBtn.height){
-                    DrawRectangleLines(hardBtn.x, hardBtn.y, hardBtn.width, hardBtn.height ,RED);
                     if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
                         softMode = false;
                         hardMode = true; // sets the walls to be hard i.e. gameOver when hit
@@ -254,7 +344,6 @@ int main(void)
 
             if(GetMousePosition().x > softBtn.x && GetMousePosition().x < softBtn.x + softBtn.width &&
                 GetMousePosition().y > softBtn.y && GetMousePosition().y < softBtn.y + softBtn.height){
-                    DrawRectangleLines(softBtn.x, softBtn.y, softBtn.width, softBtn.height ,RED);
                     if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
                         softMode = true; // sets the walls to be soft i.e. appear on opposite side of screen when travel through
                         hardMode = false;
@@ -263,7 +352,6 @@ int main(void)
             
             if(GetMousePosition().x > slowBtn.x && GetMousePosition().x < slowBtn.x + slowBtn.width &&
                 GetMousePosition().y > slowBtn.y && GetMousePosition().y < slowBtn.y + slowBtn.height){
-                    DrawRectangleLines(slowBtn.x, slowBtn.y, slowBtn.width, slowBtn.height ,RED);
                     if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
                         speedVal = 10; // sets the speedVal to be the slowest iteration, for every 10 frames the snake moves
                         slowBorder = true;
@@ -274,7 +362,6 @@ int main(void)
             
             if(GetMousePosition().x > fastBtn.x && GetMousePosition().x < fastBtn.x + fastBtn.width &&
                 GetMousePosition().y > fastBtn.y && GetMousePosition().y < fastBtn.y + fastBtn.height){
-                    DrawRectangleLines(fastBtn.x, fastBtn.y, fastBtn.width, fastBtn.height ,RED);
                     if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
                         speedVal = 5; // middle speed, every 5 frames the snake moves
                         slowBorder = false;
@@ -285,7 +372,6 @@ int main(void)
             
             if(GetMousePosition().x > superSpeedyBtn.x && GetMousePosition().x < superSpeedyBtn.x + superSpeedyBtn.width &&
                 GetMousePosition().y > superSpeedyBtn.y && GetMousePosition().y < superSpeedyBtn.y + superSpeedyBtn.height){
-                    DrawRectangleLines(superSpeedyBtn.x, superSpeedyBtn.y, superSpeedyBtn.width, superSpeedyBtn.height ,RED);
                     if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
                         speedVal = 2; // fastest speed, every 2 frames the snake moves
                         slowBorder = false;
@@ -310,35 +396,37 @@ int main(void)
         }
         // Draws the game screen - snake moving, treats generated and walls to denote the hard wall variant if relevant
         else if(!gameOver){
-            ClearBackground(BLACK);
+            ClearBackground(BLANK);
+            DrawTexture(groundBackground,0,0,WHITE);
+
             for(int i = 0; i < snakeLength; i++){
                 if(i == 0){
                     if(snakeDirection.y > 0){
-                        DrawTexturePro(snakeHead1Texture, 
-                                        (Rectangle){0, 0, (float)snakeHead1Texture.width, (float)snakeHead1Texture.height}, 
-                                        (Rectangle){player[i].GetPosition().x+snakeHead1Texture.width/2.0f, player[i].GetPosition().y+snakeHead1Texture.height/2.0f,snakeHead1Texture.width,snakeHead1Texture.height}, 
-                                        {snakeHead1Texture.width/2.0f,snakeHead1Texture.height/2.0f}, 
+                        DrawTexturePro(snakeHeadAnim, 
+                                        (Rectangle){0, 0, (float)snakeHeadAnim.width, (float)snakeHeadAnim.height}, 
+                                        (Rectangle){player[i].GetPosition().x+snakeHeadAnim.width/2.0f, player[i].GetPosition().y+snakeHeadAnim.height/2.0f,snakeHeadAnim.width,snakeHeadAnim.height}, 
+                                        {snakeHeadAnim.width/2.0f,snakeHeadAnim.height/2.0f}, 
                                         0.0f, 
                                         WHITE);
                     } else if(snakeDirection.y < 0){
-                        DrawTexturePro(snakeHead1Texture, 
-                                        (Rectangle){0, 0, snakeHead1Texture.width,snakeHead1Texture.height}, 
-                                        (Rectangle){player[i].GetPosition().x+snakeHead1Texture.width/2.0f, player[i].GetPosition().y+snakeHead1Texture.height/2.0f,snakeHead1Texture.width,snakeHead1Texture.height}, 
-                                        {snakeHead1Texture.width/2.0f,snakeHead1Texture.height/2.0f}, 
+                        DrawTexturePro(snakeHeadAnim, 
+                                        (Rectangle){0, 0, snakeHeadAnim.width,snakeHeadAnim.height}, 
+                                        (Rectangle){player[i].GetPosition().x+snakeHeadAnim.width/2.0f, player[i].GetPosition().y+snakeHeadAnim.height/2.0f,snakeHeadAnim.width,snakeHeadAnim.height}, 
+                                        {snakeHeadAnim.width/2.0f,snakeHeadAnim.height/2.0f}, 
                                         180.0f, 
                                         WHITE);
                     } else if(snakeDirection.x > 0){
-                        DrawTexturePro(snakeHead1Texture, 
-                                        (Rectangle){0, 0,snakeHead1Texture.width,snakeHead1Texture.height}, 
-                                        (Rectangle){player[i].GetPosition().x+snakeHead1Texture.width/2.0f, player[i].GetPosition().y+snakeHead1Texture.height/2.0f,snakeHead1Texture.width,snakeHead1Texture.height}, 
-                                        {snakeHead1Texture.width/2.0f,snakeHead1Texture.height/2.0f}, 
+                        DrawTexturePro(snakeHeadAnim, 
+                                        (Rectangle){0, 0,snakeHeadAnim.width,snakeHeadAnim.height}, 
+                                        (Rectangle){player[i].GetPosition().x+snakeHeadAnim.width/2.0f, player[i].GetPosition().y+snakeHeadAnim.height/2.0f,snakeHeadAnim.width,snakeHeadAnim.height}, 
+                                        {snakeHeadAnim.width/2.0f,snakeHeadAnim.height/2.0f}, 
                                         270.0f, 
                                         WHITE);
                     } else{
-                        DrawTexturePro(snakeHead1Texture, 
-                                        (Rectangle){0, 0,snakeHead1Texture.width,snakeHead1Texture.height}, 
-                                        (Rectangle){player[i].GetPosition().x+snakeHead1Texture.width/2.0f, player[i].GetPosition().y+snakeHead1Texture.height/2.0f,snakeHead1Texture.width,snakeHead1Texture.height}, 
-                                        {snakeHead1Texture.width/2.0f,snakeHead1Texture.height/2.0f}, 
+                        DrawTexturePro(snakeHeadAnim, 
+                                        (Rectangle){0, 0,snakeHeadAnim.width,snakeHeadAnim.height}, 
+                                        (Rectangle){player[i].GetPosition().x+snakeHeadAnim.width/2.0f, player[i].GetPosition().y+snakeHeadAnim.height/2.0f,snakeHeadAnim.width,snakeHeadAnim.height}, 
+                                        {snakeHeadAnim.width/2.0f,snakeHeadAnim.height/2.0f}, 
                                         90.0f, 
                                         WHITE);
                     } 
@@ -440,7 +528,7 @@ int main(void)
             tastyTreat.Draw();
             
             if(hardMode){
-                DrawRectangleLinesEx(hardWalls,3.0f, RED);
+                DrawRectangleLinesEx(hardWalls,3.0f, BROWN);
             }
             
         }
@@ -463,6 +551,21 @@ int main(void)
     // De-Initialization
     //--------------------------------------------------------------------------------------
     UnloadTexture(tastyAppleTexture);
+    UnloadTexture(snakeBodyTexture);
+    UnloadTexture(snakeBodyTurnTexture);
+    UnloadTexture(snakeHead1Texture);
+    UnloadTexture(snakeHead2Texture);
+    UnloadTexture(snakeHead3Texture);
+    UnloadTexture(snakeHeadAnim);
+    UnloadTexture(snakeTailTexture);
+    UnloadTexture(groundBackground);
+    UnloadMusicStream(gameTrack);
+    UnloadMusicStream(menuTrack);
+    UnloadSound(eatingTreats);
+    UnloadSound(gameOverSound);
+
+
+    CloseAudioDevice();
     CloseWindow();        // Close window and OpenGL context
     //--------------------------------------------------------------------------------------
 
