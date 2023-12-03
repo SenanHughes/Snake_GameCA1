@@ -162,18 +162,7 @@ int main(void)
             {
                 UpdateMusicStream(gameTrack);
             }
-            // the movement control of the snake - up and down are positive and negative versions of the size of the snake head, left and right copy the same concept
-            // Movement approach originated from Snake Raylib Game - https://github.com/raysan5/raylib-games/blob/master/classics/src/snake.c
-            if (IsKeyPressed(KEY_UP) && snakeDirection.y == 0 && singleKeyPress)
-            {
-                snakeDirection = {0, -actorSize};
-                singleKeyPress = false; // this bool prevents the keys being pressed so fast that the snake would move backwards along it's current line
-                up = true;              // the following four bools are needed for the texture drawing further down, by assigning a direction to each portion of the snake
-                left = false;           // when the snake is changing direction it allows the SnakeBodyTurn texture to be oriented appropriately
-                down = false;
-                right = false;
-            }
-            
+
             // At the start of each Game session the speedValue & score are reset - mostly relevant for Play Again
             if(frameCount == 0){
                 speedVal = startingSpeedVal;
@@ -189,6 +178,20 @@ int main(void)
                 }
             } 
 
+
+            // the movement control of the snake - up and down are positive and negative versions of the size of the snake head, left and right copy the same concept
+            // Movement approach originated from Snake Raylib Game - https://github.com/raysan5/raylib-games/blob/master/classics/src/snake.c
+            if (IsKeyPressed(KEY_UP) && snakeDirection.y == 0 && singleKeyPress)
+            {
+                snakeDirection = {0, -actorSize};
+                singleKeyPress = false; // this bool prevents the keys being pressed so fast that the snake would move backwards along it's current line
+                up = true;              // the following four bools are needed for the texture drawing further down, by assigning a direction to each portion of the snake
+                left = false;           // when the snake is changing direction it allows the SnakeBodyTurn texture to be oriented appropriately
+                down = false;
+                right = false;
+            }
+            
+            
             if (IsKeyPressed(KEY_DOWN) && snakeDirection.y == 0 && singleKeyPress)
             {
                 snakeDirection = {0, actorSize};
@@ -397,7 +400,7 @@ int main(void)
             DrawTextEx(altFont, "Slow", {80, 395}, 60, 0, RAYWHITE);
             DrawTextEx(altFont, "Fast", {280, 395}, 60, 0, RAYWHITE);
             DrawTextEx(altFont, "Super Speedy", {500, 395}, 60, 0, RAYWHITE);
-            DrawTextEx(altFont, "START", {screenWidth / 2.0f - MeasureTextEx(altFont,"START",60,0).x/2, 595}, 100, 0, GREEN);
+            DrawTextEx(altFont, "START", {screenWidth / 2.0f - MeasureTextEx(altFont,"START",100,0).x/2, 595}, 100, 0, GREEN);
 
             // purely an aesthetic inclusion, adding the game character below the main title
             DrawTexture(snakeHeadAnim, 500, 160, WHITE);
