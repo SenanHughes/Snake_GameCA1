@@ -35,6 +35,7 @@ int main(void)
     int snakeLength = 1;                                    // intial snake size
     int speedVal = 10;                                      // initialising snake speed
     int tongueAnim = 0;
+    int tonguePos = 0;
     Vector2 snakeDirection = {0,0};                         // intialising direction the snake moves
     Vector2 previousSnakeSection[snakeSize] = {0,0};        // initialising the holder for previous snake positions
     bool previousSnakeUp[snakeSize] = {false};
@@ -46,17 +47,18 @@ int main(void)
     InitAudioDevice();
     
     //LoadingTextures in 
+    // Pixelated Apple Sprite sourced from itch.io, Author Santigou - https://santigou.itch.io/apple-sprite
     Texture2D tastyAppleTexture = LoadTexture("Resources/Textures/apple.png");
-
+    // Pixelated Snake Sprite Sheet sourced from OpenGameArt.org, Author Blooming Pixels - https://opengameart.org/content/snake-sprite-sheet
     Texture2D snakeHead1Texture = LoadTexture("Resources/Textures/snakeHead_tongueIn.png");
     Texture2D snakeHead2Texture = LoadTexture("Resources/Textures/snakeHead_tongueMid.png");
     Texture2D snakeHead3Texture = LoadTexture("Resources/Textures/snakeHead_tongueOut.png");
     Texture2D snakeBodyTexture = LoadTexture("Resources/Textures/snakeBody.png");
     Texture2D snakeTailTexture = LoadTexture("Resources/Textures/snakeTail.png");
     Texture2D snakeBodyTurnTexture = LoadTexture("Resources/Textures/snakeBodyTurn.png");
-    Texture2D groundBackground = LoadTexture("Resources/Textures/groundTexture.png");
     Texture2D snakeHeadAnim = snakeHead1Texture;
-    int tonguePos = 0;
+    //Ground Artwork sourced from OpenGameArt.org, Author GrumpyDiamond - https://opengameart.org/content/tilecraft-tile-set-ground
+    Texture2D groundBackground = LoadTexture("Resources/Textures/groundTexture.png");
 
     
     Snake player[snakeSize];
@@ -82,11 +84,14 @@ int main(void)
     //--------------------------------------------------------------------------------------
     ClearBackground(RAYWHITE);
     DrawText("Loading...", screenWidth/2 - 180, screenHeight/2 - 20, 60, BLACK);
-        
-    Music menuTrack = LoadMusicStream("Resources/Music/Pleasant_Creek_Loop.wav");
-    Music gameTrack = LoadMusicStream("Resources/Music/Juhani_Junkala_[Chiptune Adventures]_2_Stage2.wav");
     
+    // Menu Music sourced from OpenGameArt.org, Author Matthew Pablo - https://opengameart.org/content/pleasant-creek
+    Music menuTrack = LoadMusicStream("Resources/Music/Pleasant_Creek_Loop.wav");
+    // Game Music sourced from OpenGameArt.org, Author SubspaceAudio - https://opengameart.org/content/4-chiptunes-adventure
+    Music gameTrack = LoadMusicStream("Resources/Music/Juhani_Junkala_[Chiptune Adventures]_2_Stage2.wav");
+    // Eating sound effect sourced from OpenGameArt.org, Author StarNinjas - https://opengameart.org/content/7-eating-crunches
     Sound eatingTreats = LoadSound("Resources/soundEffects/crunch3.wav");
+    // Game Over sound effect sourced from OpenGameArt.org, Author den_yes - https://opengameart.org/content/game-over-soundold-school
     Sound gameOverSound = LoadSound("Resources/soundEffects/GameOver.wav");
 
     while (!IsMusicReady(gameTrack) && !IsMusicReady(menuTrack) && !IsSoundReady(eatingTreats)){
