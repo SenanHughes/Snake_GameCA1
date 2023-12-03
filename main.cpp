@@ -29,13 +29,18 @@ int main(void)
     bool left = false;                  //
     bool down = false;                  //
     bool right = false;                 //
+    bool incSpeed = false;
     int frameCount = 0;                                       // initialises the frame count at 0
     float actorSize = 20.0f;                                  // sets the size of the snake sections
     int snakeSize = (screenHeight * screenWidth) / actorSize; // initialises the total size the snake could grow to - ratio of total screen pixels against snake section size
     int snakeLength = 1;                                      // intial snake size
     int speedVal = 10;                                        // initialising snake speed
+    int startingSpeedVal = 10;
     int tongueAnim = 0;
     int tonguePos = 0;
+    int lastScoreCount = 0;
+    int scoreCount = 0;
+    int scoreThreshold = 0;
     Vector2 snakeDirection = {0, 0};                  // intialising direction the snake moves
     Vector2 previousSnakeSection[snakeSize] = {0, 0}; // initialising the holder for previous snake positions
     bool previousSnakeUp[snakeSize] = {false};
@@ -169,6 +174,21 @@ int main(void)
                 down = false;
                 right = false;
             }
+            
+            // At the start of each Game session the speedValue & score are reset - mostly relevant for Play Again
+            if(frameCount == 0){
+                speedVal = startingSpeedVal;
+                lastScoreCount = 0;
+                scoreCount = 0;
+                // Depending on the speed difficulty chosen, the rate at which the snake will pick up speed varies - higher value = more apples needing to be consumed
+                if(slowBorder){
+                    scoreThreshold = 1000;
+                } else if(fastBorder){
+                    scoreThreshold = 2000;
+                } else{
+                    scoreThreshold = 4000;
+                }
+            } 
 
             if (IsKeyPressed(KEY_DOWN) && snakeDirection.y == 0 && singleKeyPress)
             {
@@ -251,6 +271,14 @@ int main(void)
             if (player[0].GetPosition().x == tastyTreat.GetPosition().x && player[0].GetPosition().y == tastyTreat.GetPosition().y)
             {
                 PlaySound(eatingTreats);
+                // each time an apple is consumed the score goes up by 100
+                scoreCount += 100;
+                // when the score threshold has been reached, and a speed value greater than 1 the speed value will decrease and speed up the game
+                // a reduction means a faster snake due to the less frames needed for a modulus of 0 in the Move functionality 
+                if(scoreCount == lastScoreCount + scoreThreshold && speedVal > 1){
+                    speedVal = speedVal - 1;
+                    lastScoreCount = scoreCount;
+                }
                 tastyTreat.newTreatLoc({GetRandomValue(0, (screenWidth / actorSize) - 1) * actorSize, GetRandomValue(0, (screenHeight / actorSize) - 1) * actorSize});
                 // condition to avoid placing the new treat where the snake body is
                 // while loop to avoid placing treat where body is gained from raylib example - https://github.com/raysan5/raylib-games/blob/master/classics/src/snake.c
@@ -326,6 +354,7 @@ int main(void)
             snakeLength = 1;
             snakeDirection = {0, 0};
             previousSnakeSection[snakeSize] = {0, 0};
+            speedVal = startingSpeedVal;
             for (int i = 0; i < snakeSize; i++)
             {
                 player[i] = Snake({screenWidth / 2.0f, screenHeight / 2.0f}, {20, 20}, RAYWHITE);
@@ -414,7 +443,7 @@ int main(void)
             {
                 if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
                 {
-                    speedVal = 10; // sets the speedVal to be the slowest iteration, for every 10 frames the snake moves
+                    startingSpeedVal = 10; // sets the speedVal to be the slowest iteration, for every 10 frames the snake moves
                     slowBorder = true;
                     fastBorder = false;
                     superSpeedyBorder = false;
@@ -426,7 +455,7 @@ int main(void)
             {
                 if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
                 {
-                    speedVal = 5; // middle speed, every 5 frames the snake moves
+                    startingSpeedVal = 5; // middle speed, every 5 frames the snake moves
                     slowBorder = false;
                     fastBorder = true;
                     superSpeedyBorder = false;
@@ -438,7 +467,7 @@ int main(void)
             {
                 if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
                 {
-                    speedVal = 2; // fastest speed, every 2 frames the snake moves
+                    startingSpeedVal = 2; // fastest speed, every 2 frames the snake moves
                     slowBorder = false;
                     fastBorder = false;
                     superSpeedyBorder = true;
@@ -473,6 +502,7 @@ int main(void)
             ClearBackground(BLANK);
             DrawTexture(groundBackground, 0, 0, WHITE);
 
+            DrawText(TextFormat("%d",slowBorder),60,60,60,BLACK);
             for (int i = 0; i < snakeLength; i++)
             {
                 if (i == 0)
@@ -595,6 +625,7 @@ int main(void)
 
             if (gameOver)
             {
+                DrawText(TextFormat("%i", scoreCount),screenWidth/2-(MeasureText(TextFormat("%i",scoreCount),60))/2,100,60, GREEN);
                 DrawTextEx(gameOverFont, "GAME OVER", {screenWidth / 2.0f - 220.0f, screenHeight / 2.0f - 90.0f}, 90, 0, RED);
                 DrawText("Play Again?", screenWidth / 2 - 175, screenHeight / 2, 60, RAYWHITE);
                 DrawText("Y / N", screenWidth / 2 - 80, screenHeight / 2 + 80, 50, RAYWHITE);
