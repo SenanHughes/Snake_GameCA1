@@ -29,7 +29,6 @@ int main(void)
     bool left = false;                  //
     bool down = false;                  //
     bool right = false;                 //
-    bool incSpeed = false;
     int frameCount = 0;                                       // initialises the frame count at 0
     float actorSize = 20.0f;                                  // sets the size of the snake sections
     int snakeSize = (screenHeight * screenWidth) / actorSize; // initialises the total size the snake could grow to - ratio of total screen pixels against snake section size
@@ -391,14 +390,14 @@ int main(void)
 
             // start menu creation
             ClearBackground(BLANK);
-            DrawTexture(groundBackground, 0, 0, WHITE);                                                  // adding the groundBackground to the screen
-            DrawTextEx(titleFont, "Welcome to Snake", {screenWidth / 2.0f - 240.0f, 60}, 60, 0, YELLOW); // DrawTextEx was used here to allow loaded fonts to be displayed
+            DrawTexture(groundBackground, 0, 0, WHITE);         // adding the groundBackground to the screen
+            DrawTextEx(titleFont, "Welcome to Snake", {screenWidth / 2.0f - MeasureTextEx(titleFont,"Welcome to Snake",60,0).x/2, 60}, 60, 0, YELLOW); // DrawTextEx was used here to allow loaded fonts to be displayed
             DrawTextEx(altFont, "Hard Walls", {150, 235}, 60, 0, RAYWHITE);
             DrawTextEx(altFont, "Soft Walls", {550, 235}, 60, 0, RAYWHITE);
             DrawTextEx(altFont, "Slow", {80, 395}, 60, 0, RAYWHITE);
             DrawTextEx(altFont, "Fast", {280, 395}, 60, 0, RAYWHITE);
             DrawTextEx(altFont, "Super Speedy", {500, 395}, 60, 0, RAYWHITE);
-            DrawTextEx(altFont, "START", {screenWidth / 2.0f - 150.0f, 595}, 100, 0, GREEN);
+            DrawTextEx(altFont, "START", {screenWidth / 2.0f - MeasureTextEx(altFont,"START",60,0).x/2, 595}, 100, 0, GREEN);
 
             // purely an aesthetic inclusion, adding the game character below the main title
             DrawTexture(snakeHeadAnim, 500, 160, WHITE);
@@ -501,8 +500,6 @@ int main(void)
         {
             ClearBackground(BLANK);
             DrawTexture(groundBackground, 0, 0, WHITE);
-
-            DrawText(TextFormat("%d",slowBorder),60,60,60,BLACK);
             for (int i = 0; i < snakeLength; i++)
             {
                 if (i == 0)
@@ -625,10 +622,13 @@ int main(void)
 
             if (gameOver)
             {
+                DrawText("Score",screenWidth/2-(MeasureText("Score",60))/2,20,60, WHITE);
                 DrawText(TextFormat("%i", scoreCount),screenWidth/2-(MeasureText(TextFormat("%i",scoreCount),60))/2,100,60, GREEN);
-                DrawTextEx(gameOverFont, "GAME OVER", {screenWidth / 2.0f - 220.0f, screenHeight / 2.0f - 90.0f}, 90, 0, RED);
-                DrawText("Play Again?", screenWidth / 2 - 175, screenHeight / 2, 60, RAYWHITE);
-                DrawText("Y / N", screenWidth / 2 - 80, screenHeight / 2 + 80, 50, RAYWHITE);
+                DrawTextEx(gameOverFont, "GAME OVER", 
+                            {(screenWidth/2.0f)-(MeasureTextEx(gameOverFont,"GAME OVER",90,0)).x/2.0f, 
+                                screenHeight / 2.0f - 90.0f}, 90, 0, RED);
+                DrawText("Play Again?", screenWidth/2-MeasureText("Play Again?",60)/2, screenHeight / 2, 60, RAYWHITE);
+                DrawText("Y / N", screenWidth/2-MeasureText("Y / N",60)/2, screenHeight / 2 + 80, 50, RAYWHITE);
             }
         }
 
