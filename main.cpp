@@ -89,7 +89,7 @@ int main(void)
         tastyTreat.newTreatLoc({GetRandomValue(0, (screenWidth / actorSize) - 1) * actorSize, GetRandomValue(0, (screenHeight / actorSize) - 1) * actorSize});
     }
 
-    // initialising function to draw the textures - 
+    // initialising function to draw the textures -
     textureDraw funcDraw(snakeHeadAnim, {0, 0}, 0.0f, WHITE);
 
     SetTargetFPS(60); // Set our game to run at 60 frames-per-second
@@ -159,6 +159,7 @@ int main(void)
                 UpdateMusicStream(gameTrack);
             }
             // the movement control of the snake - up and down are positive and negative versions of the size of the snake head, left and right copy the same concept
+            // Movement approach originated from Snake Raylib Game - https://github.com/raysan5/raylib-games/blob/master/classics/src/snake.c
             if (IsKeyPressed(KEY_UP) && snakeDirection.y == 0 && singleKeyPress)
             {
                 snakeDirection = {0, -actorSize};
@@ -210,6 +211,7 @@ int main(void)
             }
 
             // waits for modulus of frame count and speed value to update the movement of the snake to give it the step by step movement the game had
+            // Also guided by Raylib Example - https://github.com/raysan5/raylib-games/blob/master/classics/src/snake.c
             if (frameCount % speedVal == 0)
             {
                 for (int i = 0; i < snakeLength; i++)
@@ -251,6 +253,7 @@ int main(void)
                 PlaySound(eatingTreats);
                 tastyTreat.newTreatLoc({GetRandomValue(0, (screenWidth / actorSize) - 1) * actorSize, GetRandomValue(0, (screenHeight / actorSize) - 1) * actorSize});
                 // condition to avoid placing the new treat where the snake body is
+                // while loop to avoid placing treat where body is gained from raylib example - https://github.com/raysan5/raylib-games/blob/master/classics/src/snake.c
                 for (int i = 0; i < snakeLength; i++)
                 {
                     while (tastyTreat.GetPosition().x == player[i].GetPosition().x && tastyTreat.GetPosition().y == player[i].GetPosition().y)
@@ -263,9 +266,9 @@ int main(void)
             }
             // gameOver for the hard walls variant if the snake hits the wall
             if (hardMode && (player[0].GetPosition().y < 0 ||
-                             player[0].GetPosition().y > screenHeight - player[0].GetSize().y ||
+                             player[0].GetPosition().y > screenHeight - actorSize ||
                              player[0].GetPosition().x < 0 ||
-                             player[0].GetPosition().x > screenWidth - player[0].GetSize().x))
+                             player[0].GetPosition().x > screenWidth - actorSize))
             {
                 gameOver = true;
                 PlaySound(gameOverSound);

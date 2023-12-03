@@ -3,6 +3,9 @@
 
 #include "raylib.h"
 
+// This source file originated from the Obstacle header file from https://github.com/naoisecollins/2023MSc-SoftwareEngineering1-Second-Game
+// Initially starting with the Draw & GetPosition functions before adding the newTreatLoc function to reposition the Apples across the screen 
+
 class Treats{
     private:
     Texture2D texture;
@@ -11,7 +14,6 @@ class Treats{
     Color color; 
     
     public:
-    //Treats(Vector2 pos, Vector2 sz, Color c);
     Treats(Texture2D texture, Vector2 pos, Vector2 sz, Color c);
 
     void Draw();
